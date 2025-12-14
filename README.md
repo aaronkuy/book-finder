@@ -23,3 +23,10 @@ of the the embillishment of the main format.
 - Initial experiences with async, await and fetch
 - Learning to make the overview of code blocks more structured and clear especiallly in JS.
  
+
+<img width="1467" height="829" alt="Screenshot 2025-12-14 at 16 19 30" src="https://github.com/user-attachments/assets/4b75808f-0a39-4820-8f84-dba6d2e370ff" />
+
+
+
+<img width="1466" height="829" alt="Screenshot 2025-12-14 at 16 19 51" src="https://github.com/user-attachments/assets/8de31938-4695-446a-ba95-1bd10eb9d490" />
+
