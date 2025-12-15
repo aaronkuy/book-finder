@@ -1,37 +1,48 @@
+//Here we're fetch the elements of HTML to JS
+
 const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
 const resultsDiv = document.getElementById("results");
 
+//Awaits the click of 'searchBtn' so it can conduct the command 'searchBooks'
+
 searchBtn.addEventListener("click", searchBooks);
 
+//Asynch prevent that the program blocks, while waiting for an input
 async function searchBooks() {
+//Extract the text of the Input to the variable query and erase the spaces with trim
     const query = searchInput.value.trim();
-
+//Here we catch up the individuality that the user isn't typing a value in the input field
+//then replies the following string
     if (!query) {
         alert("Please enter a book title");
         return;
     }
-
+//We allocate the Google link to the variable 'url', q means query and equates to the variable
+//'query' which takes the value dependeing to the users input (potential book title)
     const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
-
+//Due to potential errors we use try. Fetch the content of what is concatenated in url.
+//and allocate it to response.
     try {
         const response = await fetch(url);
+//Parsing it to json to have acces to the items of the body of 'response', saving it to 'data'
         const data = await response.json();
-
+//Array of books test for errors
         displayResults(data.items);
     } catch (error) {
         console.error("Error fetching books:", error);
     }
 }
-
+//The Parameter 'books' takes the value of data.
 function displayResults(books) {
+//Sets <div> empty
     resultsDiv.innerHTML = "";
-
+//Catch the individuality when 'books' has no value aligning with booknames of the index of Google
     if (!books) {
         resultsDiv.innerHTML = "<p>No books found.</p>";
         return;
     }
-
+//
     books.forEach(book => {
         const info = book.volumeInfo;
 
