@@ -10,7 +10,7 @@ of the the embillishment of the main format.
 - Interactive websites which is responsive to the user's input
 - Show's the relevant information of a specific book
 - Due to the implementation of the Google API, you have a universal acces to the whole book spectrum
-- The entered book in the inpout is displayed visually on the webdesign
+- The entered book in the input is displayed visually on the webdesign
 
 ## Tech Stack
 - HTML
