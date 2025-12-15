@@ -42,20 +42,24 @@ function displayResults(books) {
         resultsDiv.innerHTML = "<p>No books found.</p>";
         return;
     }
-//
+//Brief spelling (arrow function). Iteration loop for each element in 'books', cashed in book.
+//Extract values of volumeInfo of each book of the dictionary, allocated to 'info'.
     books.forEach(book => {
         const info = book.volumeInfo;
-
+//New html container in DOM allocated to 'bookElement' awaits. 
+//Save each cache of placeholder book to 'bookElement'
         const bookElement = document.createElement("div");
         bookElement.classList.add("book");
-
+//Revise content container in bookElement. Backticks for variables and multiple strings
+//Formation optional chaining, preventing from crash or empty string. Description to an range of 
+//index 150 coupled with '...', else empty string, if false.
         bookElement.innerHTML = `
       <h3>${info.title || "No title"}</h3>
       <p><strong>Author:</strong> ${info.authors ? info.authors.join(", ") : "Unknown"}</p>
       <img src="${info.imageLinks?.thumbnail || ""}" />
       <p>${info.description ? info.description.substring(0, 150) + "..." : ""}</p>
     `;
-
+//Display DOM 'bookelement' in browser. Program terminated.
         resultsDiv.appendChild(bookElement);
     });
 }
