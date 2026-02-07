@@ -20,7 +20,7 @@ async function searchBooks() {
     }
 //We allocate the Google link to the variable 'url', q means query and equates to the variable
 //'query' which takes the value dependeing to the users input (potential book title)
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
+const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyDJrnv-Gcn20JnnwkzUAzzxTS9TscHWv50`;
 //Due to potential errors we use try. Fetch the content of what is concatenated in url.
 //and allocate it to response.
     try {
