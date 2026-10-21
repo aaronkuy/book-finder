@@ -2,17 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Book Finder</title>
+    <meta name="description" content="Search books via the Google Books API." />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h1>📚 Book Finder</h1>
+<main class="app">
+    <header class="hero">
+        <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 4.5C5 3.7 5.7 3 6.5 3H19v14H6.5C5.7 17 5 17.7 5 18.5V4.5Z" />
+                <path d="M5 18.5C5 19.3 5.7 20 6.5 20H19" />
+                <path d="M9 7.5h6" />
+            </svg>
+        </div>
+        <h1>Book Finder</h1>
+        <p class="tagline">Search millions of books via the Google Books API.</p>
+    </header>
 
-<input type="text" id="searchInput" placeholder="Search for a book..." />
-<button id="searchBtn">Search</button>
+    <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search for a book..." autocomplete="off" aria-label="Book title" />
+        <button id="searchBtn">Search</button>
+    </div>
 
-<div id="results"></div>
+    <div id="results" aria-live="polite"></div>
+</main>
+
+<footer class="footer">
+    Built by <a href="https://github.com/aaronkuy">Aaron Kuyucu</a> · <a href="https://github.com/aaronkuy/book-finder">Source on GitHub</a>
+</footer>
 
 <script src="script.js"></script>
 </body>
