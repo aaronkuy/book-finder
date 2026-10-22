@@ -1,32 +1,50 @@
-# Book Finder App
+# Book Finder
 
-## Description 
-This is my first usage of an API, where I focused more on the implemantation in JS.
-That's why I made a very plain web design, so the focus is more on the book research 
-tool itself. In the future you can combine it with other API's coupled with an adjustment 
-of the the embillishment of the main format.
+A small web app that searches books through the Google Books API and shows title, author, cover and a short description.
 
-## Features 
-- Interactive websites which is responsive to the user's input
-- Show's the relevant information of a specific book
-- Due to the implementation of the Google API, you have a universal acces to the whole book spectrum
-- The entered book in the input is displayed visually on the webdesign
+![Screenshot of Book Finder](docs/screenshot.png)
 
-## Tech Stack
-- HTML
-- Java Script
-- CSS
-- Google Book API
+## Features
 
-## The things I've learned
-- I was able to solidify already existing JS knowledge to an further extend
-- Initial experiences with async, await and fetch
-- Learning to make the overview of code blocks more structured and clear especiallly in JS.
- 
+- Search by title or keyword, with a message for empty input
+- Result cards with title, authors, cover and the first 150 characters of the description
+- "No books found" state and error handling around the request
+- Responsive layout for desktop and phone
 
-<img width="1467" height="829" alt="Screenshot 2025-12-14 at 16 19 30" src="https://github.com/user-attachments/assets/4b75808f-0a39-4820-8f84-dba6d2e370ff" />
+## Tech
 
+- HTML, CSS, vanilla JavaScript
+- `fetch` with `async`/`await`
+- Google Books API (`volumes` endpoint)
 
+## How to run
 
-<img width="1466" height="829" alt="Screenshot 2025-12-14 at 16 19 51" src="https://github.com/user-attachments/assets/8de31938-4695-446a-ba95-1bd10eb9d490" />
+Open the live version: **[aaronkuy.github.io/book-finder](https://aaronkuy.github.io/book-finder/)**
 
+Or run it locally. There is no build step and no dependency:
+
+```bash
+git clone https://github.com/aaronkuy/book-finder.git
+cd book-finder
+open index.html        # macOS; on Linux use xdg-open, on Windows start
+```
+
+## What I learned
+
+- My first work with an external API: building the request URL, parsing JSON, handling missing fields
+- `async`/`await` and `try`/`catch` around network calls
+- Rendering a list of results into the DOM
+
+## What I'd do next
+
+- Encode the query with `encodeURIComponent` and add paging
+- Show a loading state while the request runs
+- Build result cards with DOM methods instead of `innerHTML`
+
+## Notes
+
+Uses a client-side API key restricted to this site; for production the key would sit behind a small proxy. Searching from a local `file://` copy is therefore blocked by Google; use the live version.
+
+## License
+
+See [LICENSE](LICENSE).
