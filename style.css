@@ -312,3 +312,16 @@ h1 {
         width: 100%;
     }
 }
+
+/* Keep the layout, drop the movement, for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+    }
+
+    .search-button:active {
+        transform: none;
+    }
+}
