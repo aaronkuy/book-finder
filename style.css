@@ -6,6 +6,11 @@
     --line: #e4e6ee;
     --accent: #4f46e5;
     --accent-hover: #4338ca;
+    --accent-glow: rgba(79, 70, 229, 0.32);
+    --hero-glow: #e4e6ff;
+    --cover-bg: #e9ebf5;
+    --cover-missing-from: #eceef7;
+    --cover-missing-to: #dcdfee;
     --error: #b42318;
     --radius: 14px;
     --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 8px 24px rgba(20, 22, 28, 0.06);
@@ -24,7 +29,7 @@ body {
     line-height: 1.5;
     color: var(--ink);
     background:
-        radial-gradient(1100px 480px at 50% -140px, #e4e6ff 0%, rgba(228, 230, 255, 0) 70%),
+        radial-gradient(1100px 480px at 50% -140px, var(--hero-glow) 0%, transparent 70%),
         var(--bg);
 }
 
@@ -62,10 +67,10 @@ body {
     margin: 0 auto 16px;
     display: grid;
     place-items: center;
-    border-radius: 14px;
+    border-radius: var(--radius);
     background: var(--accent);
     color: #ffffff;
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.32);
+    box-shadow: 0 8px 20px var(--accent-glow);
 }
 
 .logo svg {
@@ -118,7 +123,7 @@ h1 {
     pointer-events: none;
 }
 
-#search-input {
+.search-input {
     flex: 1;
     min-width: 0;
     padding: 10px 12px 10px 44px;
@@ -131,16 +136,16 @@ h1 {
     color: var(--ink);
 }
 
-#search-input::placeholder {
+.search-input::placeholder {
     color: var(--muted);
 }
 
 /* Chromium and Safari add their own clear button to type="search". */
-#search-input::-webkit-search-cancel-button {
+.search-input::-webkit-search-cancel-button {
     cursor: pointer;
 }
 
-#search-button {
+.search-button {
     padding: 10px 24px;
     border: 0;
     border-radius: 999px;
@@ -152,15 +157,15 @@ h1 {
     transition: background 0.15s ease, transform 0.08s ease;
 }
 
-#search-button:hover {
+.search-button:hover {
     background: var(--accent-hover);
 }
 
-#search-button:active {
+.search-button:active {
     transform: scale(0.97);
 }
 
-#search-button:focus-visible {
+.search-button:focus-visible {
     outline: 3px solid var(--accent);
     outline-offset: 2px;
 }
@@ -183,7 +188,7 @@ h1 {
 
 /* Results */
 
-#results {
+.results {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
@@ -256,7 +261,7 @@ h1 {
     height: 104px;
     object-fit: cover;
     border-radius: 6px;
-    background: #e9ebf5;
+    background: var(--cover-bg);
     box-shadow: 0 1px 3px rgba(20, 22, 28, 0.15);
 }
 
@@ -266,7 +271,7 @@ h1 {
     place-items: center;
     font-size: 0.7rem;
     color: var(--muted);
-    background: linear-gradient(135deg, #eceef7, #dcdfee);
+    background: linear-gradient(135deg, var(--cover-missing-from), var(--cover-missing-to));
 }
 
 /* Footer */
@@ -303,7 +308,20 @@ h1 {
         top: 27px;
     }
 
-    #search-button {
+    .search-button {
         width: 100%;
+    }
+}
+
+/* Keep the layout, drop the movement, for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+    }
+
+    .search-button:active {
+        transform: none;
     }
 }
