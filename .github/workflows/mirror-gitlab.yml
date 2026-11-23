@@ -15,7 +15,9 @@ on:
 permissions:
   contents: read
 
-# One mirror run at a time; a newer run waits instead of overtaking an older one.
+# One mirror run at a time. A running mirror is never cancelled; at most one run waits,
+# and a newer run replaces a waiting one. Every run pushes the complete set of branches
+# and tags, so a replaced run loses nothing.
 concurrency:
   group: mirror-gitlab
   cancel-in-progress: false
