@@ -1,65 +1,159 @@
-//Here we're fetch the elements of HTML to JS
+import { MIN_QUERY_LENGTH, buildSearchUrl, toBook } from "./books.js";
 
-const searchBtn = document.getElementById("searchBtn");
-const searchInput = document.getElementById("searchInput");
-const resultsDiv = document.getElementById("results");
+// Open Library usually answers within two seconds but can hang for much
+// longer. After this time the search gives up and says so.
+const TIMEOUT_MS = 15000;
 
-//Awaits the click of 'searchBtn' so it can conduct the command 'searchBooks'
+const form = document.getElementById("search-form");
+const input = document.getElementById("search-input");
+const statusLine = document.getElementById("status");
+const errorLine = document.getElementById("error");
+const resultList = document.getElementById("results");
 
-searchBtn.addEventListener("click", searchBooks);
+// The search that is allowed to change the page. A newer search replaces it.
+let activeRequest = null;
 
-//Asynch prevent that the program blocks, while waiting for an input
-async function searchBooks() {
-//Extract the text of the Input to the variable query and erase the spaces with trim
-    const query = searchInput.value.trim();
-//Here we catch up the individuality that the user isn't typing a value in the input field
-//then replies the following string
-    if (!query) {
-        alert("Please enter a book title");
+// Submitting the form covers both the button and the Enter key.
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    searchBooks(input.value.trim());
+});
+
+async function searchBooks(query) {
+    if (query.length < MIN_QUERY_LENGTH) {
+        showError(`Type at least ${MIN_QUERY_LENGTH} characters: a title, an author or a keyword.`);
+        input.focus();
         return;
     }
-//We allocate the Google link to the variable 'url', q means query and equates to the variable
-//'query' which takes the value dependeing to the users input (potential book title)
-const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=AIzaSyBukgBb-0JGQ0SnZ-vtUJOnWG9ZP62MRRI`;
-//Due to potential errors we use try. Fetch the content of what is concatenated in url.
-//and allocate it to response.
+
+    // Without this, two quick searches would race and the slower answer
+    // would overwrite the newer one.
+    activeRequest?.abort();
+    const request = new AbortController();
+    activeRequest = request;
+    const timeout = setTimeout(() => request.abort(), TIMEOUT_MS);
+
+    resultList.replaceChildren();
+    showStatus("Searching…");
+    // The button stays enabled on purpose: a disabled submit button would
+    // also block the Enter key, and a new search may replace a slow one.
+    resultList.setAttribute("aria-busy", "true");
+
     try {
-        const response = await fetch(url);
-//Parsing it to json to have acces to the items of the body of 'response', saving it to 'data'
+        const response = await fetch(buildSearchUrl(query), { signal: request.signal });
+        // fetch() only rejects when the network fails. A 4xx or 5xx answer
+        // resolves normally and has to be checked here.
+        if (!response.ok) {
+            throw new Error(`Open Library answered with HTTP ${response.status}`);
+        }
         const data = await response.json();
-//Array of books test for errors
-        displayResults(data.items);
+        if (!Array.isArray(data.docs)) {
+            throw new Error("Open Library answered without a result list");
+        }
+        showResults(query, data.docs.map(toBook), data.numFound);
     } catch (error) {
-        console.error("Error fetching books:", error);
+        // Aborted by a newer search: that search owns the page now.
+        if (activeRequest !== request) {
+            return;
+        }
+        showError(
+            request.signal.aborted
+                ? "Open Library took too long to answer. Please try again."
+                : "The search failed. Open Library may be busy, or you are offline. Please try again.",
+        );
+    } finally {
+        clearTimeout(timeout);
+        if (activeRequest === request) {
+            resultList.removeAttribute("aria-busy");
+        }
     }
 }
-//The Parameter 'books' takes the value of data.
-function displayResults(books) {
-//Sets <div> empty
-    resultsDiv.innerHTML = "";
-//Catch the individuality when 'books' has no value aligning with booknames of the index of Google
-    if (!books) {
-        resultsDiv.innerHTML = "<p>No books found.</p>";
+
+function showResults(query, books, total) {
+    if (books.length === 0) {
+        showStatus(`No books found for “${query}”.`);
         return;
     }
-//Brief spelling (arrow function). Iteration loop for each element in 'books', cashed in book.
-//Extract values of volumeInfo of each book of the dictionary, allocated to 'info'.
-    books.forEach(book => {
-        const info = book.volumeInfo;
-//New html container in DOM allocated to 'bookElement' awaits. 
-//Save each cache of placeholder book to 'bookElement'
-        const bookElement = document.createElement("div");
-        bookElement.classList.add("book");
-//Revise content container in bookElement. Backticks for variables and multiple strings
-//Formation optional chaining, preventing from crash or empty string. Description to an range of 
-//index 150 coupled with '...', else empty string, if false.
-        bookElement.innerHTML = `
-      <h3>${info.title || "No title"}</h3>
-      <p><strong>Author:</strong> ${info.authors ? info.authors.join(", ") : "Unknown"}</p>
-      <img src="${info.imageLinks?.thumbnail || ""}" />
-      <p>${info.description ? info.description.substring(0, 150) + "..." : ""}</p>
-    `;
-//Display DOM 'bookelement' in browser. Program terminated.
-        resultsDiv.appendChild(bookElement);
+
+    resultList.replaceChildren(...books.map(createCard));
+
+    const shown = books.length.toLocaleString("en");
+    const all = Number.isInteger(total) ? total.toLocaleString("en") : shown;
+    showStatus(
+        all === shown
+            ? `${shown} ${books.length === 1 ? "result" : "results"} for “${query}”.`
+            : `Showing ${shown} of ${all} results for “${query}”.`,
+    );
+}
+
+// Cards are built node by node. Titles and names come from a public,
+// user-edited catalogue; as textContent they can never turn into markup.
+function createCard(book) {
+    const card = document.createElement("li");
+    card.className = "book";
+
+    const title = document.createElement("h2");
+    title.className = "book-title";
+    if (book.url) {
+        const link = document.createElement("a");
+        link.href = book.url;
+        link.textContent = book.title;
+        title.append(link);
+    } else {
+        title.textContent = book.title;
+    }
+
+    const authors = document.createElement("p");
+    authors.className = "book-authors";
+    authors.textContent = book.authors.length > 0 ? book.authors.join(", ") : "Unknown author";
+
+    card.append(createCover(book), title, authors);
+
+    if (book.year !== null) {
+        const year = document.createElement("p");
+        year.className = "book-year";
+        year.textContent = `First published ${book.year}`;
+        card.append(year);
+    }
+
+    return card;
+}
+
+function createCover(book) {
+    if (!book.coverUrl) {
+        return createCoverPlaceholder();
+    }
+
+    const image = document.createElement("img");
+    image.className = "book-cover";
+    image.src = book.coverUrl;
+    // Decorative: the title stands right next to the cover.
+    image.alt = "";
+    image.width = 72;
+    image.height = 104;
+    image.loading = "lazy";
+    // A cover id can exist without an image behind it (404).
+    image.addEventListener("error", () => image.replaceWith(createCoverPlaceholder()), {
+        once: true,
     });
+    return image;
+}
+
+function createCoverPlaceholder() {
+    const placeholder = document.createElement("div");
+    placeholder.className = "book-cover book-cover-missing";
+    placeholder.textContent = "No cover";
+    return placeholder;
+}
+
+function showStatus(message) {
+    errorLine.hidden = true;
+    errorLine.textContent = "";
+    statusLine.textContent = message;
+}
+
+function showError(message) {
+    statusLine.textContent = "";
+    errorLine.textContent = message;
+    errorLine.hidden = false;
 }
